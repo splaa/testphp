@@ -18,16 +18,9 @@ function getCity($region_id, PDO $dbh)
 
    $data = queryDB($dbh);
     foreach ($data as $region) {
-        $json= [$region['ter_name'] => $region['ter_pid'] ];
+        $json[]= [$region['ter_name'] => $region['ter_pid'] ];
     }
-//    $json[0]['region_type'] = 'test';
-//    $json[0]['name'] = 'test';
-//    $json[1]['region_type'] = 'test';
-//    $json[1]['name'] = 'test';
-//    $json[2]['region_type'] = 'test';
-//    $json[2]['name'] = 'test';
-//    $json[3]['region_type'] = 'test';
-//    $json[3]['name'] = 'test';
+
 
 
 
