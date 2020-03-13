@@ -1,8 +1,9 @@
 <?php
-$dbh = new \PDO('mysql:host=localhost;dbname=testphp;charset=utf8', 'splaa', 'splaa1977');
+$dbh = new \PDO('mysql:host=localhost;dbname=test;charset=utf8', 'root', 'root');
 
 
 $action = isset($_GET['action']) ? $_GET['action'] : null;
+$user = [];
 
 
 function getRegion()
@@ -65,7 +66,7 @@ function getArea($region_id)
 function queryDB($dbh)
 {
 
-    $sth = $dbh->prepare('select t.ter_name, t.ter_id, t.ter_pid  from testphp.t_koatuu_tree t where t.ter_type_id=0 ;');
+    $sth = $dbh->prepare('select t.ter_name, t.ter_id, t.ter_pid  from test.t_koatuu_tree t where t.ter_type_id=0 ;');
 
 
     $sth->execute();
@@ -77,7 +78,7 @@ function queryDB($dbh)
 function queryDBCity($dbh, $region_id)
 {
     $sth = $dbh->prepare('select t.ter_name, t.ter_id, t.ter_pid  
-from testphp.t_koatuu_tree t 
+from test.t_koatuu_tree t 
 where ter_id= ' . $region_id . ' or ter_pid=' . $region_id . ' ;');
 
     $sth->execute();
@@ -87,7 +88,7 @@ where ter_id= ' . $region_id . ' or ter_pid=' . $region_id . ' ;');
 function queryDBArea($dbh, $region_id)
 {
     $sth = $dbh->prepare('select t.ter_name, t.ter_id, t.ter_pid  
-from testphp.t_koatuu_tree t 
+from test.t_koatuu_tree t 
 where t.ter_type_id=2 
   and ter_id= ' . $region_id . ' or ter_pid=' . $region_id . ' ;');
 
@@ -117,7 +118,6 @@ if (!is_null($action)) {
 
 function insertDbUser($post)
 {
-
    if(!isMailExists($post['email'])) {
 
        global $dbh;
@@ -135,34 +135,33 @@ function insertDbUser($post)
                'area' => $area
            ]);
 
-
-       $sql = "INSERT INTO user(name, email, territory, territory_json) VALUES (?,?,?,?)";
+       $sql = "INSERT INTO user SET name=:name, email=:email, territory=:territory, territory_json=:territory_json;";
        $stmt = $dbh->prepare($sql);
-       $stmt->execute([$fio, $email, $territory, $territory]);
+	   $stmt->bindParam(':name', $fio);
+	   $stmt->bindParam(':email', $email);
+	   $stmt->bindParam(':territory', $territory);
+	   $stmt->bindParam(':territory_json', $territory, PDO::PARAM_STR);
+	   $stmt->execute();
    } else {
-
-       $user = showModalCard(getUserByEmail($post['email']));
-
+		global $user;
+		$user = getUserByEmail($post['email']);
    }
 
 }
-function showModalCard($user){
-    return $user;
 
-}
 function getUserByEmail($email)
 {
     global $dbh;
-    $sth = $dbh->prepare('select u.*  from testphp.user u where u.email= ? ;');
+    $sth = $dbh->prepare('select u.id, u.name, u.email, (SELECT tkt.ter_name FROM t_koatuu_tree tkt WHERE ter_id = JSON_EXTRACT(u.territory_json, "$.region_id")) as region, (SELECT tkt.ter_name FROM t_koatuu_tree tkt WHERE ter_id = JSON_EXTRACT(u.territory_json, "$.city_id")) as city, (SELECT tkt.ter_name FROM t_koatuu_tree tkt WHERE ter_id = JSON_EXTRACT(u.territory_json, "$.area")) as area  from test.user u where u.email= ? ;');
     $sth->execute([$email]);
 
-    return $sth->fetch();
+    return $sth->fetch(PDO::FETCH_ASSOC);
 }
 
 function isMailExists($mail)
 {
     global $dbh;
-    $res = $dbh->query('select count(u.email)  from testphp.user u where email= \''.$mail.'\'');
+    $res = $dbh->query('select count(u.email)  from test.user u where email= \''.$mail.'\'');
     return $res->fetchColumn()>0 ? true : false;
 }
 

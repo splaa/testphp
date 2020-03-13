@@ -2,10 +2,9 @@
 
 include __DIR__ . '/function.php';
 $post = isset($_POST['submit']) ? $_POST : null;
-if ($post) {insertDbUser($post);}
-if (isset($user))
-{
 
+if ($post) {
+	insertDbUser($post);
 }
 ?>
 
@@ -17,8 +16,7 @@ if (isset($user))
     <title>PhpTest</title>
 
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
     <!-- Custom style -->
     <style>
         main > .container {
@@ -49,34 +47,6 @@ if (isset($user))
     <link rel="stylesheet" href="lib/chosen_v1.8.7/chosen.min.css"/>
 </head>
 <body class="d-flex flex-column h-100">
-
-<?php if (isset($user)):?>
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Запустить модальное окно
-    </button>
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php endif;?>
 <header>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container">
@@ -112,7 +82,7 @@ if (isset($user))
             <div class="side-by-side clearfix">
                 <div>
                     <em>Список областей:</em>
-                    <select name="region_id" data-placeholder="Выберите область..." class="chosen-select" tabindex="1">
+                    <select name="region_id" autocomplete="off" data-placeholder="Выберите область..." class="chosen-select" tabindex="1">
                         <option value=""></option>
                         <?php foreach (getRegion() as $region): ?>
                             <option value="<?php echo $region['ter_pid'] ?>"><?php echo $region['ter_name'] ?></option>
@@ -120,7 +90,7 @@ if (isset($user))
                     </select>
                     <br>
                     <em>Список городов:</em>
-                    <select name="city"
+                    <select name="city"  autocomplete="off"
                             style="min-width: 200px"
                             data-placeholder="Выберите город..."
                             class="chosen-select" tabindex="1">
@@ -128,7 +98,7 @@ if (isset($user))
                     </select>
                     <br>
                     <em>Список районов:</em>
-                    <select name="area"
+                    <select name="area" autocomplete="off"
                             data-placeholder="Выберите район..."
                             class="chosen-select" tabindex="1"
                             style="min-width: 200px">
@@ -148,16 +118,9 @@ if (isset($user))
     </div>
 
 </footer>
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
-<script src="lib/chosen_v1.8.7/docsupport/jquery-3.2.1.min.js" type="text/javascript"></script>
+
+<script src="jquery-2.1.1.min.js"></script>
+<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 <script src="lib/chosen_v1.8.7/chosen.jquery.js" type="text/javascript"></script>
 <script src="lib/chosen_v1.8.7/docsupport/prism.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/chosen_v1.8.7/docsupport/init.js" type="text/javascript" charset="utf-8"></script>
@@ -245,8 +208,51 @@ if (isset($user))
             }
         });
     });
-
-
 </script>
+<?php if (!empty($user)):?>
+	<!-- Modal -->
+	<div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="userModalLabel">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<table class="table">
+						<thead class="thead-light">
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">ФИО</th>
+							<th scope="col">Email</th>
+							<th scope="col">Область</th>
+							<th scope="col">Город</th>
+							<th scope="col">Район</th>
+						</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th scope="row"><?php echo $user['id'] ?></th>
+								<td><?php echo $user['name'] ?></td>
+								<td><?php echo $user['email'] ?></td>
+								<td><?php echo $user['region'] ?></td>
+								<td><?php echo $user['city'] ?></td>
+								<td><?php echo $user['area'] ?></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+        $(document).ready(function(){
+            $('#userModal').modal('show');
+        });
+	</script>
+<?php endif; ?>
 </body>
 </html>
